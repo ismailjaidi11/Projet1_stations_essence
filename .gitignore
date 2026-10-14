@@ -1,0 +1,8 @@
+# Environnement virtuel (se recrée avec requirements.txt)
+venv/
+
+# Données générées par la pipeline (se régénèrent en la relançant)
+data/
+
+# Fichiers temporaires de Python
+__pycache__/
