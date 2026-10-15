@@ -13,10 +13,8 @@ offset=100
 
 while offset< data["total_count"] :
     r=requests.get(URL,params= {"limit" : 100 ,"offset":offset},timeout=10)
-    if r.status_code!=200 :
-        print(r.status_code)
-        print(f"offset{offset}")
-        break
+    if r.status_code != 200:
+        raise SystemExit(f"Erreur API {r.status_code} à l'offset {offset}, collecte annulée") #on utilise cette fonction au lieu d un simple break car si lextraction echoue il faut arreter tout le programme completement et n'enregistre aucun nouveau fichier ca evitera une collecte partielle des données
     data=r.json()
     liste.extend(data["results"])
     offset+=100

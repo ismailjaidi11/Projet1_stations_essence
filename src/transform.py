@@ -1,13 +1,19 @@
 import pandas as pd
 from datetime import datetime 
 import sqlite3
+from pathlib import Path
 
-#on importe le fichier json puis on definit nos constantes 
-FICHIER = "data/data_2026-10-12_23h47.json" 
-df=pd.read_json(FICHIER)
+
+#On prend le fichier le plus recent de toutes mes collectes
+fichiers=list(Path("data").glob(pattern="data_*.json"))
+fichier=str(max(fichiers))
+
+# On definit nos constantes et la date de la collecte des données 
+
+df=pd.read_json(fichier)
 SEUIL=7
 CARBURANTS="sp98","e10","gplc","e85","sp95","gazole"
-texte_date = FICHIER.replace("data/","").replace("data_", "").replace(".json", "")
+texte_date = Path(fichier).stem.replace("data_", "") #.stem supprime le dossier et le .json du nom du fichier
 date_collecte = datetime.strptime(texte_date, "%Y-%m-%d_%Hh%M")
 date_collecte = pd.Timestamp(date_collecte).tz_localize("Europe/Paris").tz_convert("UTC")
 print("Date de collecte (UTC) :", date_collecte)
@@ -87,17 +93,28 @@ for carburant in CARBURANTS :
     print(carburant + "_prix")
     print(f"{((colonne>borne_sup )| (colonne<borne_inf)).sum()} valeurs suspectes !! ")
 
-#nous allons ajouter une colonne date_collecte a notre df pour savoir quand esqu on a collecter chaque donnee du fichier
+#nous allons ajouter une colonne date_collecte a notre df pour savoir quand esqu on a collecter chaque donnee du fichier puuis enleve les colonnes que sqlLite ne peut pa slire comme les listes
 
 df["date_collecte"]=date_collecte
-
-#Connectons notre tableau a une base sqlite 
 df = df.drop(columns=["carburants_disponibles", "carburants_indisponibles"])
 df["services_service"] = df["services_service"].str.join(";")
 
+#Connectons notre tableau a une base sqlite et securiser la base des doublons de tableaux 
+
 conn = sqlite3.connect("data/carburants.db")
-df.to_sql("stations",conn,if_exists="append",index=False)
+try :
+    tab_dates_existantes=pd.read_sql("SELECT DISTINCT date_collecte FROM stations ", conn)
+    colonne_dates=pd.to_datetime(tab_dates_existantes["date_collecte"],utc=True)
+except Exception:
+    colonne_dates = pd.Series(dtype="datetime64[ns, UTC]")
+if (colonne_dates== date_collecte).any() :
+    print("cette collecte existe dèja dans la base !!! \n")
+else :
+    df.to_sql("stations",conn,if_exists="append",index=False)
+print(pd.read_sql("SELECT date_collecte, COUNT(*) AS nb FROM stations GROUP BY date_collecte", conn))
 conn.close()
+
+ 
 
 
 
