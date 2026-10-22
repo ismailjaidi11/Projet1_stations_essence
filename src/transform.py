@@ -39,7 +39,7 @@ df=df.drop(columns="geom")
 print(f"{df.columns}\n")
 print(f"{df.shape}\n")
 
-#verification si ya des statiosn hors france metropolitaine 
+#verification si ya des stations hors france metropolitaine 
 print("verifions si il y'a des stations hors france metropolitaine \n")
 print(df["latitude"].min(), df["latitude"].max())
 print(f"{df["longitude"].min(), df["longitude"].max()} \n ")

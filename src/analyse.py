@@ -77,6 +77,3 @@ proches = proches.sort_values("gazole_prix")
 
 print(f"{len(proches)} stations à moins de {RAYON_KM} km de Cergy")
 print(proches[["ville", "adresse", "type_route", "gazole_prix", "distance_km"]].head(10).round(2))
-
-
-
