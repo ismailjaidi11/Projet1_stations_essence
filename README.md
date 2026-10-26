@@ -1,6 +1,6 @@
 # Where and when to buy fuel at the best price?
 
-A personal project to learn how to build an end-to end: every hour, I collect the prices of the ~9,800 French fuel stations from the government API, clean them, store them in a SQLite database, and analyze them.
+A personal project to learn how to build an end-to end project: every hour, I collect the prices of the ~9,800 French fuel stations from the government API, clean them, store them in a SQLite database, and analyze them.
 
 ## What I found
 
