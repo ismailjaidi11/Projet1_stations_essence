@@ -1,19 +1,15 @@
 # Where and when to buy fuel at the best price?
 
-A personal project to learn how to build an end-to end data pipeline: every hour, I collect the prices of the ~9,800 French fuel stations from the government API, clean them, store them in a SQLite database, and analyze them.
+A personal project to learn how to build an end-to end: every hour, I collect the prices of the ~9,800 French fuel stations from the government API, clean them, store them in a SQLite database, and analyze them.
 
 ## What I found
 
-How much can you save on a 50 L diesel fill-up?
-
-1. **Choosing the right department → up to ~€10.75 saved**
-   The cheapest department is about 21 cts/L cheaper than the most expensive one.
-2. **Avoiding the highway → ~€4.70 saved**
-   Highway stations are about 9.4 cts/L more expensive than those on regular roads.
-3. **Picking the right time of day → less than €0.50 saved**
-   Prices vary by less than 1 ct/L over the day.
-4. **Picking the right day of the week → ~€0.15 saved**
-   Prices vary by only ~0.3 ct/L from one day to another.
+| Factor | Average gap (diesel) | On a 50 L fill-up |
+|---|---|---|
+| Cheapest vs most expensive department | ~21 cts/L | ~€10.75 |
+| Highway vs regular road | ~9.4 cts/L | ~€4.70 |
+| Day of the week | ~0.3 ct/L | ~€0.15 |
+| Time of day | < 1 ct/L | < €0.50 |
 
 **In short: where you fill up matters far more than when.** No need to wait for a specific day or time. Avoiding highways and picking a cheaper area saves much more.
 
@@ -24,7 +20,9 @@ How much can you save on a 50 L diesel fill-up?
 
 ## How it works
 
-**data.economie.gouv.fr API → extract.py → raw JSON → transform.py → SQLite → analyse.py**
+```
+data.economie.gouv.fr API → extract.py → raw JSON → transform.py → SQLite → analyse.py
+```
 
 - **Extract**: fetches all stations in batches of 100 (pagination) and saves a timestamped raw JSON. If the API returns an error, the run is cancelled so no incomplete data gets loaded.
 - **Transform**: cleans the latest JSON and appends it to the database. A collection that is already stored is never added twice.
