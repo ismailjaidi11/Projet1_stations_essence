@@ -77,3 +77,20 @@ proches = proches.sort_values("gazole_prix")
 
 print(f"{len(proches)} stations à moins de {RAYON_KM} km de Cergy")
 print(proches[["ville", "adresse", "type_route", "gazole_prix", "distance_km"]].head(10).round(2))
+
+
+#Quand faire le plein d'essence ?
+conn = sqlite3.connect("data/carburants.db")
+df = pd.read_sql("SELECT id, date_collecte, gazole_prix FROM stations", conn)
+conn.close()
+df["date_collecte"] = pd.to_datetime(df["date_collecte"], utc=True).dt.tz_convert("Europe/Paris")
+df["jour"]=df["date_collecte"].dt.day_name()
+df["heure"]=df["date_collecte"].dt.hour
+par_jour=df.groupby("jour")["gazole_prix"].agg(["mean", "count"])
+par_heure=df.groupby("heure")["gazole_prix"].agg(["mean", "count"])
+par_jour=par_jour.sort_values("mean")
+par_heure=par_heure.sort_values("mean")
+par_jour["mean"]=par_jour["mean"].round(3)
+par_heure["mean"]=par_heure["mean"].round(3)
+print(f"Les heures où le carburant est le moins cher sont : {par_heure.head(24)} \n")
+print(f"Les jours où le carburant est le moins cher sont : {par_jour.head(7)} \n")
